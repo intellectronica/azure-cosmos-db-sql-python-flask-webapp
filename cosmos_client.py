@@ -1,38 +1,27 @@
-from azure.cosmos import exceptions, CosmosClient, PartitionKey
+from azure.cosmos import exceptions, CosmosClient, PartitionKey, DatabaseProxy, ContainerProxy
 import config
 
-class CosmosClient():
+class Cosmos():
+    def __init__(self) -> None:
+        self.client = self.create_cosmos_client()
+        self.database = self.create_database("database_name")
 
     def create_cosmos_client(self)-> None:
         '''Create a client-side logical representation of an Azure Cosmos DB account.'''
-        self.client = CosmosClient(config.ENDPOINT, config.KEY)
+        return CosmosClient(config.ENDPOINT, config.KEY)
 
-    def create_database(self, database_name: str)-> None:
+    def create_database(self, database_name: str)-> DatabaseProxy:
         '''Create a database if it does not already exist on the service.'''
-        #TODO: Add ThroughputProperties
-        database = self.client.create_database_if_not_exists(id=database_name)
-
-    def create_databases(self, databases_list: list)-> None:
-        '''Create a database per element sent in the databases_list'''
-        for database_name in databases_list:
-            self.create_database(database_name)
+        # TODO: Add ThroughputProperties
+        return self.client.create_database_if_not_exists(id=database_name)
     
-    def create_container(self, database: str, container_details: dict)-> None:
+    def create_container(self, database: str, container_details: dict)-> ContainerProxy:
         '''Create a container if it does not already exist on the service.'''
-        container = database.create_container_if_not_exists(
+        return database.create_container_if_not_exists(
             id=container_details['container_name'], 
             partition_key=PartitionKey(path=container_details['/partitionKey']),
             offer_throughput=container_details['throughput']
         )
-    def create_containers(self, database_name: str, containers_list: list[dict])-> None:
-        '''Create a container per element sent in the containers_list'''
-        for container_details in containers_list:
-            self.create_container(database_name, container_details)
-    
-    def create_items(self, container, items: list[dict]):
-        '''Create a item per element in the items list'''
-        for item in items:
-            container.create_item(body=item)
 
     def read_container_items(self, container) -> list[dict]:
         '''Get the item identified by item.'''
@@ -41,15 +30,20 @@ class CosmosClient():
         print(f'Read item with id {id}. Operation consumed {request_units} request units')
         return items
     
-    def read_item(self, container, id: str, partition_key: str) -> dict:
+    def read_item(self, database_name: str, container_name: str, id: str, partition_key: str) -> dict:
         '''Get the item identified by item.'''
+        # TODO: handle possible errors 
+        # Retrieve an existing database with the specified ID (name).
+        database = self.client.get_database_client(database_name)
+        # Get the ContainerProxy for a container the with specified ID (name).
+        container = database.get_container_client(container_name)
         try:
             item = container.read_item(item=id, partition_key=partition_key)
             request_units = container.client_connection.last_response_headers['x-ms-request-charge']
             print(f'Read item with id {id}. Operation consumed {request_units} request units')
         except exceptions.CosmosHttpResponseError:
             item = {}
-            print(f'Item with id {id} does not exist in the {container} container.')
+            print(f'Item with id {id} does not exist in the {container} container of {database} database.')
         
         return item
     
@@ -57,7 +51,7 @@ class CosmosClient():
         items = list(container.query_items(query=sql_query, enable_cross_partition_query=True))
 
     def check_if_item_exist(self, container, id: str, partition_key: str):
-        #TODO
+        # TODO
         pass
 
     def replace_item(self, container, id: str, new_body: dict, ):

@@ -1,5 +1,5 @@
-# azure-cosmos-db-sql-python-sample
-This sample shows how to work with the Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK.
+# azure-cosmos-db-sql-python-webapp
+This sample shows how to work with the Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK  tr.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ Before you can run this sample, you must have the following prerequisites:
 ## Running this sample
 
 1. Clone this repository using:
-```git clone https://github.com/Azure-Samples/azure-cosmos-db-python-getting-started.git```
+    ```git clone https://github.com/Azure-Samples/azure-cosmos-db-python-getting-started.git```
 
 1. Open the ```config.py``` file and substitute the ENDPOINT and the KEY values with the values from your Cosmos DB Account.
 
