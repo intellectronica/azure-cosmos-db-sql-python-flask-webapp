@@ -17,3 +17,31 @@ Before you can run this sample, you must have the following prerequisites:
 1. Open the ```config.py``` file and substitute the ENDPOINT and the KEY values with the values from your Cosmos DB Account.
 
 1. Open a terminal and run ```python cosmos_client.py```.
+
+## Request Examples
+
+### Item
+
+- Read an item:
+
+```bash
+curl -X GET  "http://127.0.0.1:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
+```
+
+- Upsert an item:
+
+```bash
+curl -X POST "localhost:5000/item?container=FamilyContainer&database=AzureSampleFamilyDatabase" -d "{\"id\": \"bar\", \"lastName\": \"bar\"}" -H "Content-Type: application/json"
+```
+
+- Delete an item:
+
+ ```bash
+curl -X DELETE  "http://127.0.0.1:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
+```
+
+- Replace an item:
+
+```bash
+curl -X PUT "localhost:5000/item?container=FamilyContainer&database=AzureSampleFamilyDatabase&id=bar" -d "{\"ola\": \"bar\", \"ole\": \"bareeee\"}" -H "Content-Type: application/json"
+```
