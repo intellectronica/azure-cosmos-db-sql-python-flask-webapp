@@ -4,7 +4,6 @@ import config
 class Cosmos():
     def __init__(self) -> None:
         self.client = self.create_cosmos_client()
-        self.database = self.create_database("database_name")
 
     def create_cosmos_client(self)-> None:
         '''Create a client-side logical representation of an Azure Cosmos DB account.'''
@@ -35,7 +34,6 @@ class Cosmos():
         # TODO: handle possible errors 
         # Retrieve an existing database with the specified ID (name).
         database = self.client.get_database_client(database_name)
-        # Get the ContainerProxy for a container the with specified ID (name).
         container = database.get_container_client(container_name)
         try:
             item = container.read_item(item=id, partition_key=partition_key)
@@ -43,7 +41,7 @@ class Cosmos():
             print(f'Read item with id {id}. Operation consumed {request_units} request units')
         except exceptions.CosmosHttpResponseError:
             item = {}
-            print(f'Item with id {id} does not exist in the {container} container of {database} database.')
+            print(f'Item with id {id} does not exist in the {container_name} container of {database_name} database.')
         
         return item
     
