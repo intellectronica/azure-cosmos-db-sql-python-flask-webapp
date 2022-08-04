@@ -1,5 +1,6 @@
 # azure-cosmos-db-sql-python-webapp
-This sample shows how to work with the Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK  tr.
+
+This sample shows Python web application (Flask) using Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK.
 
 ## Prerequisites
 
@@ -14,7 +15,7 @@ Before you can run this sample, you must have the following prerequisites:
 1. Clone this repository using:
     ```git clone https://github.com/Azure-Samples/azure-cosmos-db-python-getting-started.git```
 
-1. Open the ```config.py``` file and substitute the ENDPOINT and the KEY values with the values from your Cosmos DB Account.
+1. Open the ```config.py``` file and replace the ENDPOINT and the KEY values with the values from your Cosmos DB Account.
 
 1. Open a terminal and run ```python cosmos_client.py```.
 
@@ -45,3 +46,7 @@ curl -X DELETE  "http://127.0.0.1:5000/item?id=Smith_143fe975-5634-4743-bed8-b37
 ```bash
 curl -X PUT "localhost:5000/item?container=FamilyContainer&database=AzureSampleFamilyDatabase&id=bar" -d "{\"ola\": \"bar\", \"ole\": \"bareeee\"}" -H "Content-Type: application/json"
 ```
+
+### Container
+
+### Database

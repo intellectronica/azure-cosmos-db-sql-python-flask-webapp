@@ -1,59 +1,101 @@
-import json
-from azure.cosmos import exceptions, CosmosClient, PartitionKey, DatabaseProxy, ContainerProxy
-from requests import delete
+'''
+'''
+from typing import Iterable
+from azure.cosmos import exceptions, CosmosClient, PartitionKey
 import config
 
 class Cosmos():
+    '''Class to interact with Cosmos DB'''
     def __init__(self) -> None:
+        '''Creates a cosmos client instance'''
         self.client = self.create_cosmos_client()
 
     def create_cosmos_client(self)-> None:
         '''Create a client-side logical representation of an Azure Cosmos DB account.'''
         return CosmosClient(config.ENDPOINT, config.KEY)
 
-    def create_database(self, database_name: str)-> DatabaseProxy:
-        '''Create a database if it does not already exist on the service.'''
-        # TODO: Add ThroughputProperties
-        return self.client.create_database_if_not_exists(id=database_name)
-    
-    def create_container(self, database: str, container_details: dict)-> ContainerProxy:
-        '''Create a container if it does not already exist on the service.'''
-        return database.create_container_if_not_exists(
-            id=container_details['container_name'], 
-            partition_key=PartitionKey(path=container_details['/partitionKey']),
-            offer_throughput=container_details['throughput']
-        )
+    def get_container_client(self, database_name: str, container_name: str):
+        '''Get a container client given a database and container name.'''
+        database = self.get_database_client(database_name)
+        container = database.get_container_client(container_name)
+        return container
 
-    def read_container_items(self, container) -> list[dict]:
-        '''Get the item identified by item.'''
-        items = container.read_item()
-        request_units = container.client_connection.last_response_headers['x-ms-request-charge']
-        print(f'Read item with id {id}. Operation consumed {request_units} request units')
-        return items
-    
-    def read_item(self, database_name: str, container_name: str, id: str, partition_key: str) -> dict:
-        '''Get the item identified by the provided id.'''
-        
-        container = self.get_container_client(database_name, container_name)
-        
+    def get_database_client(self, database_name: str):
+        '''Get a database client based on a database name'''
+        return self.client.get_database_client(database_name)
+
+    # Database Operations
+    def create_database(self, database_name: str)-> None:
+        '''Create a database if it does not already exist on the service.'''
         try:
-            item = container.read_item(item=id, partition_key=partition_key)
+            self.client.create_database_if_not_exists(id=database_name)
+        except exceptions.CosmosResourceExistsError:
+            return f"{database_name} database already exists."
+        return f"{database_name} database created."
+
+    def delete_database(self, database_name: str)-> str:
+        '''Delete a database'''
+        try:
+            self.client.delete_database(database_name)
         except exceptions.CosmosHttpResponseError:
-            return f'Item with id {id} does not exist in the {container_name} container of {database_name} database.'
+            return f"{database_name} database couldn't be deleted."
+        return f"{database_name} database deleted."
+
+    def list_databases(self, max_item_count: int)-> None:
+        '''List all databases'''
+        self.client.list_databases(max_item_count)
+
+    # Container Operations
+    def create_container(self, database_name: str, container_name: str, partition_key: str)-> None:
+        '''Create a container if it does not already exist on the service.'''
+        database = self.get_database_client(database_name)
+        try:
+            database.create_container_if_not_exists(
+                id=container_name,
+                partition_key=PartitionKey(path=partition_key)
+            )
+        except exceptions.CosmosHttpResponseError:
+            return "The container creation failed."
+        return f"{container_name} container created into {database_name} database."
+
+    def delete_container(self, database_name: str, container_name: str)-> str:
+        '''Delete a container'''
+        database = self.get_database_client(database_name)
+        try:
+            database.delete_container(container_name)
+        except exceptions.CosmosHttpResponseError:
+            return f"{container_name} container of {database_name} database couldn't be deleted."
+        return f"{container_name} container of {database_name} database was deleted."
+
+    def list_containers(self, database_name: str, max_item_count: int)-> Iterable:
+        '''List containers of a database'''
+        database = self.get_database_client(database_name)
+        return database.list_containers(max_item_count)
+
+    # Item Operations
+    def read_item(self, database_name: str, container_name: str, doc_id: str, partition_key: str) -> dict:
+        '''Get the item identified by the provided id.'''
+
+        container = self.get_container_client(database_name, container_name)
+
+        try:
+            item = container.read_item(item=doc_id, partition_key=partition_key)
+        except exceptions.CosmosHttpResponseError:
+            return f'Item with id {doc_id} does not exist in the {container_name} container of {database_name} database.'
         return item
 
-    def delete_item(self, database_name: str, container_name: str, id: str, partition_key: str) -> dict:
+    def delete_item(self, database_name: str, container_name: str, doc_id: str, partition_key: str) -> dict:
         '''Delete the item identified by the provided id.'''
 
         container = self.get_container_client(database_name, container_name)
 
         try:
             container.delete_item(item=id, partition_key=partition_key)
-        except exceptions.CosmosHttpResponseError:
-            return (f'Item with id {id} was not deleted successfully from the {container} container of {database_name} database.')
         except exceptions.CosmosResourceNotFoundError:
-            return f'Item with id {id} does not exist in the {container_name} container of {database_name} database.'
-        return f'Item with id {id} deleted successfully from the {container_name} container of {database_name} database.'
+            return f'Item with id {doc_id} does not exist in the {container_name} container of {database_name} database.'
+        except exceptions.CosmosHttpResponseError:
+            return f'Item with id {doc_id} was not deleted successfully from the {container} container of {database_name} database.'
+        return f'Item with id {doc_id} deleted successfully from the {container_name} container of {database_name} database.'
 
     def upsert_item(self, database_name: str, container_name: str, body: dict):
         '''Insert or update the specified item.'''
@@ -62,10 +104,10 @@ class Cosmos():
         try:
             container.upsert_item(body)
         except exceptions.CosmosHttpResponseError:
-            return (f'The given item could not be upserted into the {container} container of {database_name} database.')
+            return f'The given item could not be upserted into the {container} container of {database_name} database.'
         return f'Item upserted successfully into the {container_name} container of {database_name} database.'
 
-    def replace_item(self, database_name: str, container_name: str, id: str, new_body: dict):
+    def replace_item(self, database_name: str, container_name: str, item: str, new_body: dict):
         '''Replaces the specified item if it exists in the container.
         id: The id or dict representing item to be replaced.
         new_body: A dict-like object representing the item to replace.'''
@@ -73,26 +115,10 @@ class Cosmos():
         container = self.get_container_client(database_name, container_name)
 
         try:
-            read_item = container.read_item(item=id, partition_key=id)
+            read_item = container.read_item(item=item, partition_key=item)
             for sub in new_body:
                 read_item[sub]  = new_body[sub]
             container.replace_item(item=read_item, body=read_item)
         except exceptions.CosmosHttpResponseError:
             return 'The replace failed or the item with given id does not exist.'
         return 'Item replaced successfully.'
-
-
-    def get_container_client(self, database_name: str, container_name: str):
-        ''''''
-        # TODO: handle possible errors 
-        database = self.client.get_database_client(database_name)
-        container = database.get_container_client(container_name)
-
-        return container
-    
-    def read_item_SQL_query(self, container, sql_query):
-        items = list(container.query_items(query=sql_query, enable_cross_partition_query=True))
-
-    def check_if_item_exist(self, container, id: str, partition_key: str):
-        # TODO
-        pass
