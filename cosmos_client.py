@@ -1,5 +1,8 @@
 '''
+Python client-side logical representation of an Azure Cosmos DB.
+This sample demonstrates the basic CRUD operations on a document in the Azure Cosmos DB API for SQL.
 '''
+
 from typing import Iterable
 from azure.cosmos import exceptions, CosmosClient, PartitionKey
 import config
@@ -21,7 +24,7 @@ class Cosmos():
         return container
 
     def get_database_client(self, database_name: str):
-        '''Get a database client based on a database name'''
+        '''Get a database client based on a database name.'''
         return self.client.get_database_client(database_name)
 
     # Database Operations
@@ -34,16 +37,16 @@ class Cosmos():
         return f"{database_name} database created."
 
     def delete_database(self, database_name: str)-> str:
-        '''Delete a database'''
+        '''Delete a database.'''
         try:
             self.client.delete_database(database_name)
         except exceptions.CosmosHttpResponseError:
             return f"{database_name} database couldn't be deleted."
         return f"{database_name} database deleted."
 
-    def list_databases(self, max_item_count: int)-> None:
-        '''List all databases'''
-        self.client.list_databases(max_item_count)
+    def list_databases(self, max_item_count: int = 10)-> list:
+        '''List all databases.'''
+        return list(self.client.list_databases(max_item_count))
 
     # Container Operations
     def create_container(self, database_name: str, container_name: str, partition_key: str)-> None:
@@ -52,14 +55,14 @@ class Cosmos():
         try:
             database.create_container_if_not_exists(
                 id=container_name,
-                partition_key=PartitionKey(path=partition_key)
+                partition_key=f"/{PartitionKey(path=partition_key)}"
             )
         except exceptions.CosmosHttpResponseError:
-            return "The container creation failed."
+            return f"The container creation failed."
         return f"{container_name} container created into {database_name} database."
 
     def delete_container(self, database_name: str, container_name: str)-> str:
-        '''Delete a container'''
+        '''Delete a container.'''
         database = self.get_database_client(database_name)
         try:
             database.delete_container(container_name)
@@ -67,14 +70,14 @@ class Cosmos():
             return f"{container_name} container of {database_name} database couldn't be deleted."
         return f"{container_name} container of {database_name} database was deleted."
 
-    def list_containers(self, database_name: str, max_item_count: int)-> Iterable:
-        '''List containers of a database'''
+    def list_containers(self, database_name: str, max_item_count: int = 10)-> Iterable:
+        '''List containers of a database.'''
         database = self.get_database_client(database_name)
-        return database.list_containers(max_item_count)
+        return list(database.list_containers(max_item_count))
 
     # Item Operations
     def read_item(self, database_name: str, container_name: str, doc_id: str, partition_key: str) -> dict:
-        '''Get the item identified by the provided id.'''
+        '''Get the item identified by the provided doc_id.'''
 
         container = self.get_container_client(database_name, container_name)
 
@@ -85,7 +88,7 @@ class Cosmos():
         return item
 
     def delete_item(self, database_name: str, container_name: str, doc_id: str, partition_key: str) -> dict:
-        '''Delete the item identified by the provided id.'''
+        '''Delete the item identified by the provided doc_id.'''
 
         container = self.get_container_client(database_name, container_name)
 
@@ -108,9 +111,7 @@ class Cosmos():
         return f'Item upserted successfully into the {container_name} container of {database_name} database.'
 
     def replace_item(self, database_name: str, container_name: str, item: str, new_body: dict):
-        '''Replaces the specified item if it exists in the container.
-        id: The id or dict representing item to be replaced.
-        new_body: A dict-like object representing the item to replace.'''
+        '''Replaces the specified item if it exists in the container.'''
 
         container = self.get_container_client(database_name, container_name)
 

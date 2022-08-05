@@ -35,7 +35,7 @@ def container():
     args = request.args
 
     if request.method == 'GET':
-        response = cosmosdb_client.list_containers(args.get('max_item_count'))
+        response = cosmosdb_client.list_containers(args.get('database'), args.get('max_item_count'))
     elif request.method == 'POST':
         response = cosmosdb_client.create_container(args.get('database'), request.args.get('container'), request.args.get('partition_key'))
     elif request.method == 'DELETE':
@@ -50,7 +50,7 @@ def database():
     args = request.args
 
     if request.method == 'GET':
-        response =  cosmosdb_client.list_databases(args.get('database'))
+        response =  cosmosdb_client.list_databases(args.get('max_item_count'))
     elif request.method == 'POST':
         response =  cosmosdb_client.create_database(args.get('database'))
     elif request.method == 'DELETE':

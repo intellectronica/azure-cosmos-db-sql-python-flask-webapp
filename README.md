@@ -1,6 +1,6 @@
-# azure-cosmos-db-sql-python-webapp
+# azure-cosmos-db-sql-python-flask-webapp
 
-This sample shows Python web application (Flask) using Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK.
+This sample shows a Python web application (Flask) using Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ Before you can run this sample, you must have the following prerequisites:
 - Read an item:
 
 ```bash
-curl -X GET  "http://127.0.0.1:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
+curl -X GET  "localhost:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
 ```
 
 - Upsert an item:
@@ -38,7 +38,7 @@ curl -X POST "localhost:5000/item?container=FamilyContainer&database=AzureSample
 - Delete an item:
 
  ```bash
-curl -X DELETE  "http://127.0.0.1:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
+curl -X DELETE  "localhost:5000/item?id=Smith_143fe975-5634-4743-bed8-b378a8c69d01&container=FamilyContainer&database=AzureSampleFamilyDatabase&partition_key=Smith"
 ```
 
 - Replace an item:
@@ -49,4 +49,40 @@ curl -X PUT "localhost:5000/item?container=FamilyContainer&database=AzureSampleF
 
 ### Container
 
+- List all databases:
+
+```bash
+curl -X GET  "localhost:5000/container?database=AzureSampleFamilyDatabase"
+```
+
+- Create container:
+
+```bash
+curl -X POST "localhost:5000/container?container=LocationContainer&database=AzureSampleFamilyDatabase&partition_key=location"
+```
+
+- Delete an item:
+
+ ```bash
+curl -X DELETE  "localhost:5000/container?container=LocationContainer&database=AzureSampleFamilyDatabase"
+```
+
 ### Database
+
+- List all databases:
+
+```bash
+curl -X GET  "localhost:5000/database?max_item_count=20"
+```
+
+- Create Database:
+
+```bash
+curl -X POST "localhost:5000/database?database=NewDatabase"
+```
+
+- Delete Database:
+
+ ```bash
+curl -X DELETE  "localhost:5000/database?database=NewDatabase
+```
