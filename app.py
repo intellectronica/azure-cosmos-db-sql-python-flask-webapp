@@ -1,11 +1,15 @@
 '''
 Flask Application
 '''
-from flask import Flask, request
+from flask import Flask, request, render_template
 from cosmos_client import Cosmos
 
 cosmosdb_client = Cosmos()
 app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route("/item", methods=['GET', 'POST', 'PUT', 'DELETE'])
