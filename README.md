@@ -21,7 +21,7 @@ Before you can run this sample, you must have the following prerequisites:
 - [Azure Cosmos DB Python SDK](https://github.com/Azure/azure-sdk-for-python/tree/main/sdk/cosmos/azure-cosmos)
 - Python 3.8+ installed
 
-## Running this sample locally
+## Run your application locally
 
 1. Clone this repository using:
 
@@ -33,9 +33,9 @@ Before you can run this sample, you must have the following prerequisites:
 
 1. If a browser doesn't open automatically, start the browser of your choice and navigate to localhost:5000. Alternatively, open a new command line and make requests. [See bellow some examples.](#Request-Examples)
 
-## Request Examples
+### Request Examples
 
-### Item
+#### Item
 
 - Read an item:
 
@@ -53,7 +53,7 @@ Before you can run this sample, you must have the following prerequisites:
 
 ```curl -X PUT "localhost:5000/item?container=<container_name>&database=<database_name>&id=<doc_id>" -d "{\"property\": \"abc\"}" -H "Content-Type: application/json"```
 
-### Container
+#### Container
 
 - List all containers:
 
@@ -67,7 +67,7 @@ Before you can run this sample, you must have the following prerequisites:
 
  ```curl -X DELETE  "localhost:5000/container?container=<container_name>&database=<database_name>"```
 
-### Database
+#### Database
 
 - List all databases:
 
