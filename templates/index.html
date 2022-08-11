@@ -6,24 +6,5 @@
 </head>
 <body>
    <h3>Python web application (Flask) using Azure Cosmos DB SQL API and the Azure Cosmos DB Python SDK.</h3>
-   <h4>Database</h4>
-   <p>My first paragraph.</p>
-   <p>My first paragraph.</p>
-   <h4>Container</h4>
-   <p>List all containers:</p>
-   <p>curl -X GET  "localhost:5000/container?database=<database_name>"</p>
-   <p>Create container:</p>
-   <p>curl -X POST "localhost:5000/container?container=<container_name>&database=<database_name>&partition_key=<partition_key>"</p>
-   <p>Delete a container:</p>
-   <p>curl -X DELETE  "localhost:5000/container?container=<container_name>&database=<database_name>"</p>
-   <h4>Item</h4>
-   <p>Read an item:</p>
-   <p>curl -X GET  "localhost:5000/item?id=<doc_id>&container=<container_name>&database=<database_name>&partition_key=<partition_key>"</p>
-   <p>Upsert an item:</p>
-   <p>curl -X POST "localhost:5000/item?container=<container_name>&database=<database_name>" -d "{\"id\": \"1234\", \"property\": \"abcd\"}" -H "Content-Type: application/json"</p>
-   <p>Delete an item:</p>
-   <p>curl -X DELETE  "localhost:5000/item?id=<doc_id>&container=<container_name>&database=<database_name>&partition_key=<partition_key>"</p>
-   <p>Replace an item:</p>
-   <p>curl -X PUT "localhost:5000/item?container=<container_name>&database=<database_name>&id=<doc_id>" -d "{\"property\": \"abc\"}" -H "Content-Type: application/json"</p>
-</body>
+  </body>
 </html>
