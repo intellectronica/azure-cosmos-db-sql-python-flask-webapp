@@ -2,7 +2,7 @@
 Flask Application
 '''
 from flask import Flask, request, render_template
-from cosmos_client import Cosmos
+from dao.dao_comsos_db_sql import Cosmos
 
 cosmosdb_client = Cosmos()
 app = Flask(__name__)
